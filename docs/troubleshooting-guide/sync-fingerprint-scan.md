@@ -79,10 +79,10 @@ Metabase syncs and scans regularly, but if the database administrator has just c
 You can "fix" this by disabling scan entirely by going to the database in the Admin Panel and telling Metabase, "This is a large database," and then going to the Scheduling tab. However, sync is necessary: without it, Metabase won't know what tables exist or what columns they contain.
 
 [api-learn]: /learn/administration/metabase-api.html
-[bugs]: ./bugs.html
-[community-db-drivers]: ../developers-guide-drivers.html
+[bugs]: ./bugs.md
+[community-db-drivers]: ../developers-guide-drivers.md
 [etl]: /glossary.html#etl
-[metabase-api]: ../api-documentation.html
-[metabase-mongo-missing]: ../administration-guide/databases/mongodb.html#i-added-fields-to-my-database-but-dont-see-them-in-metabase
-[sync-frequency]: ../administration-guide/01-managing-databases.html#choose-when-metabase-syncs-and-scans
-[troubleshooting-db-connection]: ./datawarehouse.html
+[metabase-api]: ../api-documentation.md
+[metabase-mongo-missing]: ../administration-guide/databases/mongodb.md#i-added-fields-to-my-database-but-dont-see-them-in-metabase
+[sync-frequency]: ../administration-guide/01-managing-databases.md#choose-when-metabase-syncs-and-scans
+[troubleshooting-db-connection]: ./datawarehouse.md

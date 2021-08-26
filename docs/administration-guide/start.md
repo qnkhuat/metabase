@@ -32,4 +32,8 @@ Are you in charge of managing Metabase for your organization? Then you're in the
 
 First things first, you'll need to install Metabase. If you haven’t done that yet, our [Installation Guide](../operations-guide/installing-metabase.md) will help you through the process.
 
+First things first, you'll need to install Metabase. If you haven’t done that yet, our [Installation Guide][installation-guide] will help you through the process.
+
+[installation-guide]: ../operations-guide/installing-metabase.md
+
 Already done with that? Then let’s start by going over how to [connect Metabase to your database](01-managing-databases.md).
