@@ -605,6 +605,7 @@
     ExpressionArg
     value)))
 
+
 (def ^:private OrderComparable
   "Schema for things that make sense in a filter like `>` or `<`, i.e. things that can be sorted."
   (s/if (partial is-clause? :value)
@@ -687,7 +688,7 @@
 ;;
 ;; SUGAR: This is automatically rewritten as a filter clause with a relative-datetime value
 (defclause ^:sugar time-interval
-  field   field
+  field   Field
   n       (s/cond-pre
            s/Int
            (s/enum :current :last :next))
