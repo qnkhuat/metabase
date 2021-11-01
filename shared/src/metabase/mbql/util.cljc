@@ -156,55 +156,75 @@
     [:is-empty field]  [:or  [:=  field nil] [:=  field ""]]
     [:not-empty field] [:and [:!= field nil] [:!= field ""]]))
 
+(mbql.match/replace 
+  ;[:time-interval [:expression 3]]
+  [:time-interval [:field 3 nil]]
+
+  [:time-interval [(field-or-expression :guard #{:field :expression}) id-or-name & opts]]
+  [:between (if (#{:expression} field-or-expression) 
+              [:expression (inc id-or-name)] 
+              [:field (dec id-or-name) (assoc (first opts) :temporal-unit 3)])]
+
+  )
+
+(defn- replace-field-or-expression
+  [m unit]
+  (mbql.match/replace m
+    [:field id-or-name opts] [:field id-or-name (assoc opts :temporal-unit unit)]
+    :else m))
+
 (defn desugar-time-interval
   "Rewrite `:time-interval` filter clauses as simpler ones like `:=` or `:between`."
   [m]
   (mbql.match/replace m
-    [:time-interval field n unit] (recur [:time-interval field n unit nil])
+    [:time-interval field-or-expression n unit] (recur [:time-interval field-or-expression n unit nil])
 
     ;; replace current/last/next with corresponding value of n and recur
-    [:time-interval field :current unit options] (recur [:time-interval field  0 unit options])
-    [:time-interval field :last    unit options] (recur [:time-interval field -1 unit options])
-    [:time-interval field :next    unit options] (recur [:time-interval field  1 unit options])
+    [:time-interval field-or-expression :current unit options] (recur [:time-interval field-or-expression  0 unit options])
+    [:time-interval field-or-expression :last    unit options] (recur [:time-interval field-or-expression -1 unit options])
+    [:time-interval field-or-expression :next    unit options] (recur [:time-interval field-or-expression  1 unit options])
 
-    [:time-interval [_ id-or-name opts] (n :guard #{-1}) unit (_ :guard :include-current)]
+    ; :expression
+    [:time-interval field-or-expression (n :guard #{-1}) unit (_ :guard :include-current)]
     [:between
-     [:field id-or-name (assoc opts :temporal-unit unit)]
+     (replace-field-or-expression field-or-expression unit)
      [:relative-datetime n unit]
      [:relative-datetime 0 unit]]
 
-    [:time-interval [_ id-or-name opts] (n :guard #{1}) unit (_ :guard :include-current)]
+    [:time-interval field-or-expression (n :guard #{1}) unit (_ :guard :include-current)]
     [:between
-     [:field id-or-name (assoc opts :temporal-unit unit)]
+     (replace-field-or-expression field-or-expression unit)
      [:relative-datetime 0 unit]
      [:relative-datetime n unit]]
 
-    [:time-interval [_ id-or-name opts] (n :guard #{-1 0 1}) unit _]
-    [:= [:field id-or-name (assoc opts :temporal-unit unit)] [:relative-datetime n unit]]
+    [:time-interval field-or-expression (n :guard #{-1 0 1}) unit _]
+    [:= (replace-field-or-expression field-or-expression unit) [:relative-datetime n unit]]
 
-    [:time-interval [_ id-or-name opts] (n :guard neg?) unit (_ :guard :include-current)]
+    [:time-interval field-or-expression (n :guard neg?) unit (_ :guard :include-current)]
     [:between
-     [:field id-or-name (assoc opts :temporal-unit unit)]
+     (replace-field-or-expression field-or-expression unit)
      [:relative-datetime n unit]
      [:relative-datetime 0 unit]]
 
-    [:time-interval [_ id-or-name opts] (n :guard neg?) unit _]
+    [:time-interval field-or-expression (n :guard neg?) unit _]
     [:between
-     [:field id-or-name (assoc opts :temporal-unit unit)]
+     (replace-field-or-expression field-or-expression unit)
      [:relative-datetime n unit]
      [:relative-datetime -1 unit]]
 
-    [:time-interval [_ id-or-name opts] n unit (_ :guard :include-current)]
+    [:time-interval field-or-expression n unit (_ :guard :include-current)]
     [:between
-     [:field id-or-name (assoc opts :temporal-unit unit)]
+     (replace-field-or-expression field-or-expression unit)
      [:relative-datetime 0 unit]
      [:relative-datetime n unit]]
 
-    [:time-interval [_ id-or-name opts] n unit _]
+    [:time-interval field-or-expression n unit _]
     [:between
-     [:field id-or-name (assoc opts :temporal-unit unit)]
+     (replace-field-or-expression field-or-expression unit)
      [:relative-datetime 1 unit]
-     [:relative-datetime n unit]]))
+     [:relative-datetime n unit]]
+    
+    ))
 
 (defn desugar-does-not-contain
   "Rewrite `:does-not-contain` filter clauses as simpler `:not` clauses."
